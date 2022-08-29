@@ -1,0 +1,307 @@
+Initialsing npm and other dependeices.
+npm init --y
+npm i express
+npm i mongoose
+mkdir src
+
+this will be our main app file.
+type nul > main.js 
+mkdir db -> add file connection.js in src.
+mkdir models -> add file models in src.
+
+
+const express = require("express");
+const app = express();
+now we got every method and properties in app by calling express function.
+
+
+Now perforimg routing using : app.get(Path,callback);
+app.get("/",(req,res)=>{
+
+});
+
+
+
+Initialise the port if port avaliable use it else use 3000:
+const port = process.env.PORT || 3000;
+
+
+
+Now creating Server :
+app.listen(port,()=>{
+   console.log(`Server is running Successfully at port ${port}`)
+});
+
+
+
+Now to run server we add command in dev in script and after this hit try on npm run dev to have a quick start.
+"scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev":"nodemon src/main.js -e js,hbs"
+  }
+
+
+
+Now connecting our database :
+In connection.js file writing code :
+const mongoose = require("mongoose");
+
+creating database.
+mongoose.connect("mongodb://localhost:27017/")
+
+Handling error 
+mongoose.connect("mongodb://localhost:27017/starkdatabase",{
+    useNewUrlParser:false,
+    useUnifiedTopology :false
+
+#then we get data succesfully ->
+}).then(()=>{
+    console.log("connection is Successfull.");
+
+Handling error and catching the error:
+}).catch((error)=>{
+   console.log(error);
+});
+
+-----------------
+create view folder then within create hbs file -> index.hbs
+
+----------------
+Now to store our html css js files creating folder public and within it creating html css files.
+
+---------------
+in main.js assigning the path.
+const path = require("path");
+
+// Setting the app.
+// const staticpath = path.join(__dirname); 
+
+console.log(path.join(__dirname,".."));
+
+// middleware.
+// app.use(express.static)
+-----------------
+
+
+// Setting the app.
+const staticpath = path.join(__dirname,"../public"); 
+
+// console.log(path.join(__dirname,"../public"));
+
+// middleware.
+app.use(express.static(staticpath));
+now it will show our public files not express get Hi message.
+Created Successfully.
+-----------------------
+
+
+Now linking dirctly index.hbs file not index.html from public folder.
+and installing bootstrap and jquery.->npm i bootstrap ->npm i jquery.
+
+---------------------
+now our dependeices have :
+"dependencies": {
+    "bootstrap": "^5.2.0",
+    "express": "^4.18.1",
+    "hbs": "^4.2.0",
+    "jquery": "^3.6.1",
+    "mongoose": "^6.5.3"
+  }
+---------------------
+
+Now to link css creating path in main.js :
+app.use('/css',express.static(path.join(__dirname,"../node_modules/bootstrap/dist/css")))
+app.use(express.static(staticpath));
+
+and now linking it with index.hbs files using 
+<link rel="stylesheet" href="../css/bootsrap.min.css">
+    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap-grid.min.css">
+    This will help us to keep our code neat and clean.
+--------------------------
+
+Now linking js and jquery in main.js 
+app.use('/js',express.static(path.join(__dirname,"../node_modules/bootstrap/dist/js")));
+
+app.use('/jq',express.static(path.join(__dirname,"../node_modules/jquery/dist")));
+
+  and set the link in index.hbs
+
+<script src="../jq/jquery.js" type="text/javascript"></script>
+<script src="../js/bootstrap.js" type="text/javascript"></script>
+
+----------------------
+
+now updating the express to set the view engine and hbs.
+
+app.set("view engine","hbs");
+
+----------------------
+Now setting the express -> app.get to render the main index.hbs file.
+
+app.get("/",(req,res)=>{
+    res.render("index");
+});
+
+ 
+and creating a page contact.hbs in views and setting the path in app.get
+
+app.get("/contact",(req,res)=>{
+    res.render("contact");
+});
+-----------------------
+Now to avoid repeatation of code:
+creating view and partials within templates.
+
+Now we can simply use word to put our code using {{>navbar}}
+then inform our express application and reassign path instead of view engine hbs by resetting the path.
+
+path :
+const templatespath = path.join(__dirname,"../templates/views"); 
+const partialspath = path.join(__dirname,"../templates/partials"); 
+
+telling express :
+app.set("views",templatespath);
+
+-----------------------
+Now registering the handlerbar hbs :
+
+const hbs = require("hbs");
+hbs.registerPartials(partialspath);
+------------------------
+
+now using bootstrap putting the static part in navbar then writing the dynamic part.
+creating pages home about service contact login and register using bootstrap and linking them using navbar.
+
+
+after this create user schema for mongose 
+in models create usermessage.js
+then install validator npm i validator
+to check the validity of contact form.
+
+and give the format.
+then set the models for database with name usermessage.js
+
+now setting the express form using post method
+app.post("/contact",async(req,res)=>{
+  try{
+        res.send(req.body)
+  }catch(error){
+        res.status(500).send(error);
+  }
+})
+
+----------------------------
+// Now taking the proper format of the data :
+otherwise data will not be received correctly.
+app.use(express.urlencoded({extended:false}));
+
+---------------------------
+
+now rceving data from express using post method to catch error using try error:
+try{
+        // res.send(req.body)
+        const userData = new User(req.body);
+        await userData.save();
+        res.status(201).render("/");
+  }catch(error){
+        res.status(500).send(error);
+  }
+})
+
+now we get our data on mongodb database...
+Contact page is designed succesfully.
+
+----------------------------
+
+now creating syntax format for registration form in register.js.
+
+const mongoose = require("mongoose");
+
+const registerSchema =new mongoose.Schema({
+    firstname:{
+        type:String,
+        required:true
+    },
+    email:{
+        type:String,
+        required:true
+    },
+    phone:{
+        type:Number,
+        required:true,
+        
+    },
+    password:{
+        type:String,
+        required:true
+    },
+    
+})
+// /Collections:
+const Register = new mongoose.model("Register",registerSchema);
+module.exports=Register;
+
+
+-------------------------
+
+creating template register.hbs
+simply with bootstrap name and other details.
+similairlly with login form.
+
+now in the main.js
+
+create get and post method to link with database to get and post the database.
+app.get("/register",(req,res)=>{
+    res.render("register");
+});
+
+app.post("/register",async(req,res)=>{
+    try{
+        const registerUser = new Register({
+            firstname : req.body.firstname,
+            email:req.body.email,
+            phone:req.body.phone,
+            password:req.body.password,
+        })
+        const registered =   await registerUser.save();
+        res.status(201).render("index");
+    }
+    catch(error){
+        res.status(400).send(error);
+    }
+})
+
+
+
+
+app.get("/login",(req,res)=>{
+    res.render("login");
+});
+
+app.post("/login",async(req,res)=>{
+    try{
+       const email = req.body.email;
+       const password = req.body.password;
+       
+    //    Checking the validity of the data.
+        const usere = await Register.findOne({email:email});
+        if(usere.password === password){
+            res.status(201).render("userpage");
+             this userpage will be page of current user login with user details.
+        }else{
+            res.send("Wrong Password");
+        }
+    }
+    catch(error){
+        res.status(400).send("Invalid");
+    }
+})
+
+
+Thank you.
+
+
+
+
+
+
